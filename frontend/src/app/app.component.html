@@ -1,0 +1,81 @@
+<div class="app-container">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="app-title">DocMan</h1>
+      <button class="new-doc-btn" (click)="showNewDocumentInput = true">
+        <span class="plus-icon">+</span> New Document
+      </button>
+    </div>
+
+    <!-- New Document Input -->
+    <div class="new-document-input" *ngIf="showNewDocumentInput">
+      <input
+        type="text"
+        [(ngModel)]="newDocumentTitle"
+        placeholder="Document title..."
+        (keyup.enter)="createNewDocument()"
+        (keyup.escape)="cancelNewDocument()"
+        class="document-title-input"
+        autofocus
+      />
+      <div class="new-doc-actions">
+        <button class="btn-create" (click)="createNewDocument()">Create</button>
+        <button class="btn-cancel" (click)="cancelNewDocument()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Document List -->
+    <div class="document-list">
+      <div
+        *ngFor="let doc of documents"
+        class="document-item"
+        [class.active]="currentDocument?.id === doc.id"
+        (click)="selectDocument(doc)"
+      >
+        <div class="document-item-content">
+          <div class="document-title">{{ doc.title }}</div>
+          <div class="document-date">
+            {{ doc.updatedAt ? (doc.updatedAt | date: 'MMM d, y') : 'Just now' }}
+          </div>
+        </div>
+        <button class="delete-btn" (click)="deleteDocument(doc, $event)" title="Delete">
+          ×
+        </button>
+      </div>
+      <div *ngIf="documents.length === 0" class="empty-state">
+        No documents yet. Create your first document!
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Editor Area -->
+  <div class="editor-container">
+    <div *ngIf="currentDocument" class="editor-content">
+      <!-- Document Title -->
+      <input
+        type="text"
+        [(ngModel)]="currentDocument.title"
+        (blur)="onTitleChange()"
+        class="editor-title"
+        placeholder="Untitled"
+      />
+
+      <!-- Quill Editor -->
+      <quill-editor
+        [(ngModel)]="currentDocument.content"
+        [modules]="quillConfig"
+        (onContentChanged)="onContentChange()"
+        class="quill-editor"
+        placeholder="Start writing..."
+      ></quill-editor>
+    </div>
+
+    <div *ngIf="!currentDocument" class="empty-editor">
+      <div class="empty-editor-content">
+        <h2>Welcome to DocMan</h2>
+        <p>Select a document from the sidebar or create a new one to get started.</p>
+      </div>
+    </div>
+  </div>
+</div>
