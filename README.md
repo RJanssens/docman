@@ -4,8 +4,11 @@ A full-stack document management application built with Angular and Spring Boot,
 
 ## Features
 
+- **Secure Authentication**: OAuth2/OIDC authentication via Keycloak
+- **User Management**: Track document authors and user information
 - **Rich Text Editor**: Powered by Quill with full formatting capabilities
 - **Document Management**: Create, edit, delete, and organize documents
+- **Author Tracking**: Each document shows who created it and when
 - **Auto-Save**: Documents are automatically saved as you type
 - **Notion-like UI**: Clean, modern interface inspired by Notion and Confluence
 - **Responsive Design**: Works seamlessly on desktop browsers
@@ -15,12 +18,15 @@ A full-stack document management application built with Angular and Spring Boot,
 
 ### Backend
 - **Spring Boot 3.2.0** - Java framework for building the REST API
+- **Spring Security** - OAuth2 Resource Server for JWT validation
 - **Spring Data JPA** - Data persistence layer
 - **H2 Database** - In-memory database for development
+- **Keycloak** - Identity and Access Management
 - **Maven** - Dependency management
 
 ### Frontend
 - **Angular 17** - Frontend framework
+- **angular-oauth2-oidc** - OAuth2/OIDC client library
 - **Quill** - Rich text WYSIWYG editor
 - **ngx-quill** - Angular integration for Quill
 - **RxJS** - Reactive programming
@@ -32,6 +38,7 @@ A full-stack document management application built with Angular and Spring Boot,
 - **Node.js 18** or higher
 - **npm** or **yarn**
 - **Maven 3.6+**
+- **Docker** - For running Keycloak
 
 ## Installation & Setup
 
@@ -42,7 +49,30 @@ git clone <repository-url>
 cd docman
 ```
 
-### 2. Backend Setup
+### 2. Keycloak Setup
+
+**IMPORTANT**: You must set up Keycloak before running the application. See [KEYCLOAK_SETUP.md](KEYCLOAK_SETUP.md) for detailed instructions.
+
+Quick start:
+
+```bash
+# Start Keycloak with Docker
+docker run -d \
+  --name keycloak \
+  -p 8180:8080 \
+  -e KEYCLOAK_ADMIN=admin \
+  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  quay.io/keycloak/keycloak:latest \
+  start-dev
+```
+
+Then follow the [complete Keycloak setup guide](KEYCLOAK_SETUP.md) to:
+- Create the `docman` realm
+- Create the `docman` and `docman-frontend` clients
+- Create test users
+- Configure the client secret
+
+### 3. Backend Setup
 
 ```bash
 cd backend
@@ -62,7 +92,7 @@ The backend server will start on `http://localhost:8080`
 - Username: `sa`
 - Password: (leave empty)
 
-### 3. Frontend Setup
+### 4. Frontend Setup
 
 ```bash
 cd frontend
@@ -79,13 +109,17 @@ The frontend application will start on `http://localhost:4200`
 ## Usage
 
 1. **Open the application** in your browser at `http://localhost:4200`
-2. **Create a new document** by clicking the "+ New Document" button in the sidebar
-3. **Enter a title** and press Enter or click "Create"
-4. **Start writing** in the rich text editor
-5. **Format your text** using the toolbar (bold, italic, headers, lists, etc.)
-6. **Auto-save** - Your changes are automatically saved as you type
-7. **Switch documents** by clicking on them in the sidebar
-8. **Delete documents** by clicking the × button that appears when hovering over a document
+2. **Click "Sign in with Keycloak"** to authenticate
+3. **Login with your test user** credentials (created during Keycloak setup)
+4. **Create a new document** by clicking the "+ New Document" button in the sidebar
+5. **Enter a title** and press Enter or click "Create"
+6. **Start writing** in the rich text editor - your username will be automatically recorded as the author
+7. **Format your text** using the toolbar (bold, italic, headers, lists, etc.)
+8. **Auto-save** - Your changes are automatically saved as you type
+9. **Switch documents** by clicking on them in the sidebar
+10. **View author information** - Each document displays who created it and when
+11. **Delete documents** by clicking the × button that appears when hovering over a document
+12. **Logout** by clicking the "Logout" button in the top-right corner
 
 ## Project Structure
 

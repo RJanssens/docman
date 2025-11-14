@@ -1,8 +1,24 @@
-<div class="app-container">
+<!-- Login Screen -->
+<div *ngIf="!isAuthenticated" class="login-container">
+  <div class="login-content">
+    <h1 class="login-title">DocMan</h1>
+    <p class="login-subtitle">Secure Document Management System</p>
+    <button class="login-btn" (click)="login()">Sign in with Keycloak</button>
+  </div>
+</div>
+
+<!-- Main Application -->
+<div *ngIf="isAuthenticated" class="app-container">
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
-      <h1 class="app-title">DocMan</h1>
+      <div class="header-top">
+        <h1 class="app-title">DocMan</h1>
+        <div class="user-menu">
+          <span class="user-name">{{ currentUser?.name || currentUser?.username }}</span>
+          <button class="logout-btn" (click)="logout()" title="Logout">Logout</button>
+        </div>
+      </div>
       <button class="new-doc-btn" (click)="showNewDocumentInput = true">
         <span class="plus-icon">+</span> New Document
       </button>
@@ -35,8 +51,11 @@
       >
         <div class="document-item-content">
           <div class="document-title">{{ doc.title }}</div>
-          <div class="document-date">
-            {{ doc.updatedAt ? (doc.updatedAt | date: 'MMM d, y') : 'Just now' }}
+          <div class="document-meta">
+            <span class="document-author">{{ doc.authorName }}</span>
+            <span class="document-date">
+              {{ doc.updatedAt ? (doc.updatedAt | date: 'MMM d, y') : 'Just now' }}
+            </span>
           </div>
         </div>
         <button class="delete-btn" (click)="deleteDocument(doc, $event)" title="Delete">
@@ -60,6 +79,18 @@
         class="editor-title"
         placeholder="Untitled"
       />
+
+      <!-- Document Author Info -->
+      <div class="document-author-info" *ngIf="currentDocument.authorName">
+        <span class="author-label">Created by:</span>
+        <span class="author-name-text">{{ currentDocument.authorName }}</span>
+        <span class="author-email" *ngIf="currentDocument.authorEmail">
+          ({{ currentDocument.authorEmail }})
+        </span>
+        <span class="created-date">
+          on {{ currentDocument.createdAt | date: 'MMM d, y' }}
+        </span>
+      </div>
 
       <!-- Quill Editor -->
       <quill-editor

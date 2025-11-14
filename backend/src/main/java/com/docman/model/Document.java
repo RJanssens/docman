@@ -23,6 +23,15 @@ public class Document {
     @Column(columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "author_id", nullable = false, updatable = false)
+    private String authorId;
+
+    @Column(name = "author_name", nullable = false, updatable = false)
+    private String authorName;
+
+    @Column(name = "author_email")
+    private String authorEmail;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

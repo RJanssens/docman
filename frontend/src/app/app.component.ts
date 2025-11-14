@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
 import { DocumentService } from './services/document.service';
-import { Document } from './models/document.model';
+import { AuthService } from './services/auth.service';
+import { Document, UserInfo } from './models/document.model';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,8 @@ export class AppComponent implements OnInit {
   currentDocument: Document | null = null;
   showNewDocumentInput = false;
   newDocumentTitle = '';
+  isAuthenticated = false;
+  currentUser: UserInfo | null = null;
 
   quillConfig = {
     toolbar: [
@@ -34,10 +37,32 @@ export class AppComponent implements OnInit {
     ]
   };
 
-  constructor(private documentService: DocumentService) {}
+  constructor(
+    private documentService: DocumentService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    this.loadDocuments();
+    this.authService.isAuthenticated$.subscribe(isAuth => {
+      this.isAuthenticated = isAuth;
+      if (isAuth) {
+        this.loadDocuments();
+      }
+    });
+
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+  }
+
+  login(): void {
+    this.authService.login();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.documents = [];
+    this.currentDocument = null;
   }
 
   loadDocuments(): void {

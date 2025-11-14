@@ -5,6 +5,8 @@ import com.docman.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,7 +30,20 @@ public class DocumentController {
     }
 
     @PostMapping
-    public ResponseEntity<Document> createDocument(@RequestBody Document document) {
+    public ResponseEntity<Document> createDocument(
+            @RequestBody Document document,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        // Extract user information from JWT
+        String userId = jwt.getSubject();
+        String userName = jwt.getClaimAsString("preferred_username");
+        String email = jwt.getClaimAsString("email");
+
+        // Set author information
+        document.setAuthorId(userId);
+        document.setAuthorName(userName != null ? userName : userId);
+        document.setAuthorEmail(email);
+
         Document created = documentService.createDocument(document);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
